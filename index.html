@@ -1,0 +1,394 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parts of the Human Body</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #a1eafb, #f7d6ff);
+    text-align: center;
+    color: #333;
+}
+
+header {
+    background: #6c63ff;
+    color: white;
+    padding: 22px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.container {
+    max-width: 750px;
+    margin: 25px auto;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 5px 15px #7773;
+    margin-bottom: 20px;
+}
+
+button {
+    background: #ff8c42;
+    color: white;
+    border: none;
+    padding: 13px 22px;
+    margin: 8px;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #f36b25;
+    transform: scale(1.05);
+}
+
+.hidden {
+    display: none;
+}
+
+.body-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.body-item {
+    background: #e9e7ff;
+    padding: 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.body-item:hover {
+    background: #c9c5ff;
+}
+
+.emoji {
+    font-size: 55px;
+    margin: 15px;
+}
+
+#question {
+    font-size: 23px;
+    font-weight: bold;
+}
+
+#feedback {
+    font-weight: bold;
+    min-height: 25px;
+}
+
+#score {
+    color: #6c63ff;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+footer {
+    padding: 20px;
+    color: #555;
+}
+
+@media (max-width: 500px) {
+    header h1 {
+        font-size: 22px;
+    }
+
+    .body-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🧍 Parts of the Human Body</h1>
+    <p>Let's Learn English Together!</p>
+</header>
+
+<div class="container">
+
+    <!-- HOME -->
+    <section id="home" class="card">
+        <div class="emoji">👦👧</div>
+        <h2>Welcome to Body Parts Game!</h2>
+        <p>Learn the names of human body parts in English.</p>
+
+        <button onclick="showPage('learn')">
+            📚 Learn Mode
+        </button>
+
+        <button onclick="startQuiz()">
+            🎮 Start Quiz
+        </button>
+    </section>
+
+    <!-- LEARN MODE -->
+    <section id="learn" class="card hidden">
+        <h2>📚 Learn Body Parts</h2>
+        <p>Click a body part to learn its English name!</p>
+
+        <div class="emoji" id="bodyEmoji">🧍</div>
+
+        <h2 id="bodyName">Choose a body part</h2>
+        <p id="bodyDescription">
+            Click one of the words below.
+        </p>
+
+        <div class="body-grid" id="bodyList"></div>
+
+        <button onclick="showPage('home')">
+            🏠 Home
+        </button>
+    </section>
+
+    <!-- QUIZ MODE -->
+    <section id="quiz" class="card hidden">
+        <h2>🎮 Body Parts Quiz</h2>
+
+        <p id="questionNumber"></p>
+        <div class="emoji" id="quizEmoji">👀</div>
+
+        <p id="question">What is this body part?</p>
+
+        <div id="answers"></div>
+
+        <p id="feedback"></p>
+        <p id="score">Score: 0</p>
+
+        <button id="nextButton" class="hidden"
+            onclick="nextQuestion()">
+            Next Question ➡️
+        </button>
+
+        <button onclick="showPage('home')">
+            🏠 Home
+        </button>
+    </section>
+
+    <!-- RESULT -->
+    <section id="result" class="card hidden">
+        <div class="emoji">🏆</div>
+        <h2>Congratulations!</h2>
+        <p>You have completed the quiz!</p>
+        <h2 id="finalScore"></h2>
+        <p id="resultMessage"></p>
+
+        <button onclick="startQuiz()">
+            🔄 Play Again
+        </button>
+
+        <button onclick="showPage('home')">
+            🏠 Home
+        </button>
+    </section>
+
+</div>
+
+<footer>
+    <p>© 2026 Parts of the Human Body Educational Game</p>
+</footer>
+
+<script>
+const bodyParts = [
+    {name:"Head", emoji:"😀", description:"The top part of the body."},
+    {name:"Eyes", emoji:"👀", description:"We use our eyes to see."},
+    {name:"Ears", emoji:"👂", description:"We use our ears to hear."},
+    {name:"Nose", emoji:"👃", description:"We use our nose to smell."},
+    {name:"Mouth", emoji:"👄", description:"We use our mouth to eat and speak."},
+    {name:"Neck", emoji:"🧍", description:"The neck connects the head and body."},
+    {name:"Shoulders", emoji:"💪", description:"Shoulders connect the arms to the body."},
+    {name:"Arms", emoji:"💪", description:"We use our arms to lift things."},
+    {name:"Hands", emoji:"✋", description:"We use our hands to hold things."},
+    {name:"Fingers", emoji:"🖐️", description:"Fingers are parts of our hands."},
+    {name:"Chest", emoji:"🫁", description:"The chest is the upper front part of the body."},
+    {name:"Stomach", emoji:"🫃", description:"The stomach is in the abdominal area."},
+    {name:"Legs", emoji:"🦵", description:"We use our legs to walk and run."},
+    {name:"Knees", emoji:"🦵", description:"Knees help our legs bend."},
+    {name:"Feet", emoji:"🦶", description:"We use our feet to stand and walk."},
+    {name:"Toes", emoji:"🦶", description:"Toes are parts of our feet."}
+];
+
+function showPage(page) {
+    document.querySelectorAll(".container section")
+        .forEach(section => section.classList.add("hidden"));
+
+    document.getElementById(page).classList.remove("hidden");
+}
+
+// LEARN MODE
+const bodyList = document.getElementById("bodyList");
+
+bodyParts.forEach(part => {
+    const button = document.createElement("div");
+    button.className = "body-item";
+    button.innerHTML = `${part.emoji}<br>${part.name}`;
+
+    button.onclick = () => {
+        document.getElementById("bodyEmoji").textContent = part.emoji;
+        document.getElementById("bodyName").textContent = part.name;
+        document.getElementById("bodyDescription").textContent =
+            part.description;
+
+        const speech = new SpeechSynthesisUtterance(part.name);
+        speech.lang = "en-US";
+        speechSynthesis.cancel();
+        speechSynthesis.speak(speech);
+    };
+
+    bodyList.appendChild(button);
+});
+
+// QUIZ MODE
+let questions = [];
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
+
+function startQuiz() {
+    questions = [...bodyParts].sort(() => Math.random() - 0.5);
+    currentQuestion = 0;
+    score = 0;
+
+    showPage("quiz");
+    displayQuestion();
+}
+
+function displayQuestion() {
+    answered = false;
+
+    const part = questions[currentQuestion];
+
+    document.getElementById("questionNumber").textContent =
+        `Question ${currentQuestion + 1} of ${questions.length}`;
+
+    document.getElementById("quizEmoji").textContent = part.emoji;
+
+    document.getElementById("question").textContent =
+        "What is this body part?";
+
+    document.getElementById("feedback").textContent = "";
+    document.getElementById("score").textContent =
+        `Score: ${score}`;
+
+    document.getElementById("nextButton").classList.add("hidden");
+
+    let options = [part.name];
+
+    while (options.length < 4) {
+        let randomPart =
+            bodyParts[Math.floor(Math.random() * bodyParts.length)].name;
+
+        if (!options.includes(randomPart)) {
+            options.push(randomPart);
+        }
+    }
+
+    options.sort(() => Math.random() - 0.5);
+
+    const answers = document.getElementById("answers");
+    answers.innerHTML = "";
+
+    options.forEach(option => {
+        const button = document.createElement("button");
+        button.textContent = option;
+        button.style.display = "block";
+        button.style.width = "85%";
+        button.style.margin = "10px auto";
+
+        button.onclick = () => checkAnswer(option, part.name, button);
+
+        answers.appendChild(button);
+    });
+}
+
+function checkAnswer(answer, correct, selectedButton) {
+    if (answered) return;
+    answered = true;
+
+    const feedback = document.getElementById("feedback");
+    const buttons = document.querySelectorAll("#answers button");
+
+    buttons.forEach(button => {
+        button.disabled = true;
+
+        if (button.textContent === correct) {
+            button.style.background = "#28a745";
+        }
+    });
+
+    if (answer === correct) {
+        score++;
+        feedback.textContent = "🎉 Excellent! Correct Answer!";
+        feedback.style.color = "green";
+    } else {
+        feedback.textContent = `❌ Good try! The answer is ${correct}.`;
+        feedback.style.color = "red";
+        selectedButton.style.background = "#dc3545";
+    }
+
+    document.getElementById("score").textContent =
+        `Score: ${score}`;
+
+    document.getElementById("nextButton").classList.remove("hidden");
+}
+
+function nextQuestion() {
+    currentQuestion++;
+
+    if (currentQuestion < questions.length) {
+        displayQuestion();
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    showPage("result");
+
+    const percentage = Math.round(
+        (score / questions.length) * 100
+    );
+
+    document.getElementById("finalScore").textContent =
+        `${score} / ${questions.length} (${percentage}%)`;
+
+    let message = "";
+
+    if (percentage >= 80) {
+        message = "Amazing! You are a Body Parts Expert! 🌟";
+    } else if (percentage >= 50) {
+        message = "Good Job! Keep Learning! 😊";
+    } else {
+        message = "Keep Practicing! You Can Do It! 💪";
+    }
+
+    document.getElementById("resultMessage").textContent = message;
+}
+</script>
+
+</body>
+</html>
